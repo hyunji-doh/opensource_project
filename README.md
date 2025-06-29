@@ -1,21 +1,19 @@
-MIT License
+# 오픈소스 도구로 만드는 간단한 백신 프로그램
 
-Copyright (c) 2025 HyunjiDoh
+## 1. 아이템 선정 동기
+고등학생 시절부터 백신 프로그램에 대한 관심이 많았다. 당시에는 개발 역량이 부족해 실제로 프로그램을 제작하지는 못했지만, 백신의 기본 원리와 종류 등에 대해 스스로 탐구하며 흥미를 가진 경험이 있다. 이후 대학교에 입학한 뒤에는, 과거에 탐구했던 내용을 바탕으로 백신 프로그램을 직접 만들어보고 싶다는 생각을 하였고, 이를 실현하기 위해 오픈소스 도구를 활용한 백신 제작에 도전하게 되었다. 특히 악성코드를 탐지할 수 있는 YARA라는 오픈소스 도구에 주목하게 되었고, 이를 기반으로 탐지 기능을 포함한 간단한 백신 프로그램을 제작하게 되었다.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 2. 개발 과정
+프로젝트는 크게 3단계로 나누어서 진행하였다. 
+첫 번째 단계에서는 YARA의 규칙 문법을 학습하고, 탐지할 문자열을 기준으로 하는 기본적인 .yar 규칙 파일을 작성하였다. 이때 문자열이 탐지될 조건을 설정하는 ‘strings’와 ‘condition’ 블록을 이해하는 데 어려움이 있었으나, 공식 문서와 예제를 참고하여 해결하였다.
+두 번째 단계에서는 python을 이용하여 ‘.yar’규칙을 파일에 적용하고 그 결과를 출력하는 스크립트를 제작하였다. 검사 대상 파일이 존재하지 않거나 탐지 결과가 없을 때의 예외 처리를 포함하여 출력이 가능하도록 설계하였다.
+마지막 단계에서는 pyinstaller를 활용해 python 스크립트를 실행 파일로 변환하였다. 이 과정에서 dist, build 폴어와 scanner.spec 등 자동 생성되는 파일들의 의미를 확인하며, 실행파일로 정상 작동하기 위한 디렉토리 구조를 구성하였다. 최종적으로는 실행 파일 만으로도 악성 문자열 탐지가 가능한 간단한 백신 프로그램이 완성되었다. 
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+## 3. 개발하면서 발생했던 문제점
+이번 백신 프로그램 제작 과정에서는 여러 시행착오가 발생하였다. 먼저, YARA 도구를 처음 접하면서 strings와 condition 블록을 어떻게 구성해야 하는지 어려움을 겪었고, 이를 해결하기 위해 공식 예제들을 참고하였다. 또한 Python 코드에서 파일이 존재하지 않거나 악성 문자열이 탐지되지 않는 상황에 대해 적절한 예외 처리를 구현하는 부분에서 혼란이 있었고, 이는 Python의 조건문 처리와 파일 검사 흐름을 다시 학습하는 계기가 되었다.
+가장 당황스러웠던 문제는 evil.yar 파일이 실제로는 evil.yar.txt로 저장되어 탐지가 되지 않았던 점이었다. 이후 Windows의 파일 확장자 숨김 설정 때문이라는 것을 이해하고 이를 수정해 해결할 수 있었다. 또한 PyInstaller 사용 시 자동 생성되는 build 폴더와 scanner.spec 파일의 의미가 처음에는 불분명했지만, 자료를 찾아보며 PyInstaller의 빌드 구조를 이해하는 데 도움이 되었다.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+## 4. 감상(느낀 점 및 한계)
+이번 실습을 통해 단순히 코드를 작성하는 것을 넘어서, 보안 도구의 구조와 원리를 학습할 수 있었다. 특히 문자열 기반 탐지의 한계를 체감하면서, 실제 악성코드는 다양한 방식으로 탐지 우회를 시도한다는 점을 이해하게 되었다, 향후에는 파일의 고유 해시값을 기반으로 알려진 악성코드를 탐지하는 백신 프로그램을 구현해보고자 하는 목표를 세우게 되었다.
+또한 이번 경험을 통해 YARA, Python, PyInstaller와 같은 오픈소스 도구만으로도 백신 프로그램을 직접 제작할 수 있다는 점이 매우 흥미로웠다. 상용 소프트웨어가 아니더라도 기본적인 보안 메커니즘을 구현할 수 있다는 가능성을 알게 되었고, 이러한 오픈소스 도구들을 조합하여 나만의 보안 도구를 만들어볼 수 있다는 점에서 보안 개발에 대한 흥미가 매우 커졌다.
+스스로 오류를 찾아내고 수정해가는 과정에서 많은 것을 배웠고, 실무적인 감각도 함께 키울 수 있었던 유익한 경험이었다.
